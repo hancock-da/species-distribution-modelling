@@ -12,3 +12,7 @@ The performance of ensembles is often assumed to be better than individual model
 > Species occurrence records from: *GBIF.org (10 December 2021) GBIF Occurrence Download https://doi.org/10.15468/dl.u9qgut*
 
 > Hao, T., Elith, J., Guillera-Arroita, G. & Lahoz-Monfort, J.J. (2019) ‘A review of evidence about use and performance of species distribution modelling ensembles like BIOMOD’, Diversity and Distributions, 25(5), pp. 839–852.
+
+# License
+
+This project is licensed under the MIT license - see LICENSE.txt file for more details.
