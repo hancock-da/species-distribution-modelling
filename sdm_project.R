@@ -7,6 +7,7 @@ library(biomod2)
 library(remotes)
 library(ENMTools)
 
+setwd('C:/Users/Danny/Documents/projects/species-distribution-modelling')
 
 gbif_download = readr::read_tsv("datasets/bank_vole_occurence.csv")
 
@@ -66,11 +67,16 @@ points(acsel, cex=1, col='red',pch='x')
 points(actest, cex=1, col='blue',pch='x')
 
 ### ENVIRONMENTAL DATA ###
-path <- "datasets/bioclim"
-files <- list.files(path, pattern='tif$',full.names=TRUE)
+bioclim_path <- "datasets/bioclim"
+bioclim_files <- list.files(bioclim_path, pattern='tif$',full.names=TRUE)
+copernicus_path <- "datasets/copernicus"
+copernicus_files <- list.files(copernicus_path, pattern='tif$',full.names=TRUE)
+builtup <- raster(copernicus_files)
+cropped_builtup <- crop(builtup, extent(r))
 
 # create a rasterStack of predictor variables and crop to same extent as species occurences
-predictors <-  stack(files)
+predictors <-  stack(bioclim_files)
+
 #cropped_predictors <- crop(predictors[[1]], extent(r))
 
 
@@ -86,6 +92,9 @@ cropRasterStack <- function(stack, e) {
 }
 
 cropped_predictors <- cropRasterStack(predictors, r)
+cropped_predictors[[1]]
+cropped_predictors <- addLayer(cropped_predictors, cropped_builtup)
+
 plot(cropped_predictors)
 
 # drop explanatory variables to remove collinearity and prevent overfitting
@@ -96,9 +105,15 @@ cor_plot <- raster.cor.plot(cropped_predictors, method='pearson')
 cor_plot
 
 # keep most biologically easy to explain layers
-test_predictors <- dropLayer(predictors, c('wc2.1_2.5m_bio_10','wc2.1_2.5m_bio_11','wc2.1_2.5m_bio_3','wc2.1_2.5m_bio_5','wc2.1_2.5m_bio_9', 'wc2.1_2.5m_bio_6','wc2.1_2.5m_bio_4',
-                                           'wc2.1_2.5m_bio_13','wc2.1_2.5m_bio_14','wc2.1_2.5m_bio_16','wc2.1_2.5m_bio_17','wc2.1_2.5m_bio_19'))
-test_predictors_cropped <- cropRasterStack(test_predictors, r)
+test_predictors_cropped <- dropLayer(cropped_predictors, c('wc2.1_2.5m_bio_10','wc2.1_2.5m_bio_11','wc2.1_2.5m_bio_3','wc2.1_2.5m_bio_5','wc2.1_2.5m_bio_9',
+                                                           'wc2.1_2.5m_bio_6','wc2.1_2.5m_bio_4', 'wc2.1_2.5m_bio_13','wc2.1_2.5m_bio_14','wc2.1_2.5m_bio_16',
+                                                           'wc2.1_2.5m_bio_17','wc2.1_2.5m_bio_19'))
+
+# testing further reduced predictors to prevent overfitting
+test_predictors_cropped <- dropLayer(test_predictors_cropped, c('wc2.1_2.5m_elev','wc2.1_2.5m_bio_8','wc2.1_2.5m_bio_12','wc2.1_2.5m_bio_15',
+                                                                'wc2.1_2.5m_bio_2'))
+
+
 cor_mat <- raster.cor.matrix(test_predictors_cropped, method = 'pearson')
 cor_mat > 0.7 # no more correlated explanatory variables
 
@@ -109,7 +124,6 @@ myResp <- rep(1, nrow(acsel))
 myEval <- rep(1, nrow(actest))
 SpecName <- 'BankVole'
 
-
 # for pseudo absences, using surface range envelop (sre) - pseudo absence points
 # are selected in conditions that differ from a defined proportion (PA.sre.quant)
 # of the presence data. Forces PAs to be selected outside of the broadly defined 
@@ -117,40 +131,41 @@ SpecName <- 'BankVole'
 
 
 # first use BIOMOD to generate pseudoabsences for training data
-myBiomodPA <- BIOMOD_FormatingData(resp.var = myResp,
-                                   expl.var = test_predictors_cropped,
-                                   resp.xy = acsel,
-                                   PA.nb.rep = 1,
-                                   PA.nb.absences = length(myResp),
-                                   PA.strategy = 'sre',
-                                   PA.sre.quant = 0.1,
-                                   resp.name = SpecName)
+myBiomodPA_train <- BIOMOD_FormatingData(resp.var = myResp,
+                                         expl.var = test_predictors_cropped,
+                                         resp.xy = acsel,
+                                         PA.nb.rep = 1,
+                                         PA.nb.absences = length(myResp),
+                                         PA.strategy = 'sre',
+                                         PA.sre.quant = 0.1,
+                                         resp.name = SpecName)
 
 # grab pseudoabsence data from formatted dataset
-train_sp <- SpatialPointsDataFrame(coords = myBiomodPA@coord, 
-                                 data = data.frame(species = myBiomodPA@data.species), 
-                                 proj = CRS(proj4string(test_predictors_cropped)))
+train_sp <- SpatialPointsDataFrame(coords = myBiomodPA_train@coord, 
+                                   data = data.frame(species = myBiomodPA_train@data.species), 
+                                   proj = CRS(proj4string(test_predictors_cropped)))
 # replace NAs with 0 for pseudobsences
 train_sp$species[is.na(train_sp$species)] <- 0
 
 
 # now use BIOMOD to generate pseudoabsences for test data
-myBiomodData <- BIOMOD_FormatingData(resp.var = myEval,
-                                     expl.var = test_predictors_cropped,
-                                     resp.xy = actest,
-                                     resp.name = SpecName,
-                                     PA.nb.rep = 1,
-                                     PA.nb.absences = nrow(actest),
-                                     PA.strategy = 'sre',
-                                     PA.sre.quant = 0.1)
+myBiomodPA_test <- BIOMOD_FormatingData(resp.var = myEval,
+                                        expl.var = test_predictors_cropped,
+                                        resp.xy = actest,
+                                        resp.name = SpecName,
+                                        PA.nb.rep = 1,
+                                        PA.nb.absences = nrow(actest),
+                                        PA.strategy = 'sre',
+                                        PA.sre.quant = 0.1)
 # grab pseudoabsence data from formatted dataset
-test_sp <- SpatialPointsDataFrame(coords = myBiomodPA@coord, 
-                                   data = data.frame(species = myBiomodPA@data.species), 
-                                   proj = CRS(proj4string(test_predictors_cropped)))
+test_sp <- SpatialPointsDataFrame(coords = myBiomodPA_test@coord, 
+                                  data = data.frame(species = myBiomodPA_test@data.species), 
+                                  proj = CRS(proj4string(test_predictors_cropped)))
 # replace NAs with 0 for pseudobsences
 test_sp$species[is.na(test_sp$species)] <- 0
 
-
+train_sp
+test_sp
 # check training datapoints
 plot(test_predictors_cropped[[1]])
 points(train_sp[train_sp$species == 1,], pch=19)
@@ -162,13 +177,13 @@ points(test_sp[test_sp$species == 1,], pch=19)
 points(test_sp[test_sp$species == 0,], pch=24, col='red')
 
 # input training and test datasets to BIOMOD formatted data
-myBiomodData <- BIOMOD_FormatingData(resp.var = train_resp,
+myBiomodData <- BIOMOD_FormatingData(resp.var = train_sp$species,
                                      expl.var = test_predictors_cropped,
-                                     resp.xy = train_coords,
+                                     resp.xy = train_sp@coords,
                                      resp.name = SpecName,
-                                     eval.resp.var = test_resp,
+                                     eval.resp.var = test_sp$species,
                                      eval.expl.var = test_predictors_cropped,
-                                     eval.resp.xy = test_coords)
+                                     eval.resp.xy = test_sp@coords)
 
 
 # defining models options using default options
@@ -210,17 +225,19 @@ myBiomodModelEval["ROC", "Evaluating.data",,,]
 # retrieve variable importance
 MyBiomodModelVarImp <- get_variables_importance(myBiomodModel0ut)
 MyBiomodModelVarImp # bio_7 has high importance in best performing models
-
+rowMeans(MyBiomodModelVarImp)
 # get model names
 get_built_models(myBiomodModel0ut)
 
-# Ensemble Modeling, choose models with highest TSS
+# Ensemble Modeling, choose all three runs from model with highest ROC scores
+# in this case - gradient boosting
 myBiomodEM <- BIOMOD_EnsembleModeling(
   modeling.output = myBiomodModel0ut,
-  chosen.models = 'all',
+  chosen.models = grep('_GBM', get_built_models(
+    myBiomodModel0ut), value=TRUE),
   em.by='PA_dataset+repet',
-  eval.metric = c('TSS'),
-  eval.metric.quality.threshold = c(0.8),
+  eval.metric = c('ROC'),
+  eval.metric.quality.threshold = c(0.86),
   prob.mean = T,
   prob.cv = F,
   prob.ci = T,
@@ -233,19 +250,18 @@ myBiomodEM <- BIOMOD_EnsembleModeling(
 myBiomodEMEval <- get_evaluations(myBiomodEM)
 myBiomodEMEval
 
-## Ensemble mode built with weighted means performs best.
-# specifically random forests worked very well on test data 
-# and the three RF runs formed the basis of the ensemble.
-# RF on its own seems to outperform by ROC score.
+## Ensemble mode built with committee averaging performs best.
+# specifically gradient boosting worked very well on test data 
+# and the three GBM runs formed the basis of the ensemble.
 
 # Projections
 myBiomodProj <- BIOMOD_Projection(
   modeling.output = myBiomodModel0ut,
   new.env = test_predictors_cropped,
   proj.name = 'current',
-  selected.models = grep('_RF', get_built_models(
+  selected.models = grep('_GBM', get_built_models(
     myBiomodModel0ut), value=TRUE),
-  binary.meth = 'TSS',
+  binary.meth = 'ROC',
   compress = 'xz',
   clamping.mask = F,
   output.format = '.grd')
@@ -257,8 +273,8 @@ myCurrentProj <- get_predictions(myBiomodProj)
 myBiomodEF <- BIOMOD_EnsembleForecasting(
   EM.output = myBiomodEM,
   projection.output = myBiomodProj,
-  selected.models = grep('_EMwmeanByTSS',get_built_models(
+  selected.models = grep('_EMcaByROC',get_built_models(
     myBiomodEM), value=TRUE)
 )
-# plot the 3 weighted mean ensemble models
+# plot the 3 committee averaged ensemble models
 plot(myBiomodEF) 
