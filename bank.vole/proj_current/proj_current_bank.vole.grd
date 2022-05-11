@@ -1,0 +1,25 @@
+[general]
+creator=R package 'raster'
+created=2022-05-11 12:00:22
+[georeference]
+nrows=1138
+ncols=1477
+xmin=-19.75
+ymin=30.625
+xmax=41.7916666666667
+ymax=78.0416666666667
+projection=+proj=longlat +datum=WGS84 +no_defs
+[data]
+datatype=INT2S
+byteorder=little
+nbands=5
+bandorder=BIL
+minvalue=63:0:0:68:0
+maxvalue=883:990:996:888:998
+nodatavalue=-9999
+[legend]
+legendtype=
+values=
+color=
+[description]
+layername=bank.vole_AllData_RUN1_GBM:bank.vole_AllData_RUN1_RF:bank.vole_AllData_RUN2_RF:bank.vole_AllData_RUN3_GBM:bank.vole_AllData_RUN3_RF

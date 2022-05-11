@@ -1,0 +1,46 @@
+Wed May 11 11:50:58 CEST 2022
+MaxEnt version 3.4.4
+Reading file Back_swd.csv
+readGrid: max memory 477626368, total allocated 247463936, free 226659768, used 20804168, increment 20804168
+Reading samples from Sp_swd.csv
+Read samples: max memory 477626368, total allocated 247463936, free 220158576, used 27305360, increment 6501192
+Making features
+makeFeatures: max memory 477626368, total allocated 247463936, free 212357112, used 35106824, increment 7801464
+Command line used:  environmentallayers=bank.vole/models/bank_voleFirstModeling/m_58100774/Back_swd.csv samplesfile=bank.vole/models/bank_voleFirstModeling/m_58100774/Sp_swd.csv projectionlayers=bank.vole/models/bank_voleFirstModeling/m_58100774/Predictions/Pred_swd.csv outputdirectory=bank.vole/models/bank_voleFirstModeling/bank.vole_AllData_RUN2_MAXENT.Phillips_outputs outputformat=logistic redoifexists visible=FALSE linear=TRUE quadratic=TRUE product=TRUE threshold=TRUE hinge=TRUE lq2lqptthreshold=80 l2lqthreshold=10 hingethreshold=15 beta_threshold=-1 beta_categorical=-1 beta_lqp=-1 beta_hinge=-1 betamultiplier=1 defaultprevalence=0.5 autorun nowarnings notooltips noaddsamplestobackground
+Command line to repeat: java density.MaxEnt nowarnings noprefixes outputformat=logistic outputdirectory=bank.vole/models/bank_voleFirstModeling/bank.vole_AllData_RUN2_MAXENT.Phillips_outputs projectionlayers=bank.vole/models/bank_voleFirstModeling/m_58100774/Predictions/Pred_swd.csv samplesfile=bank.vole/models/bank_voleFirstModeling/m_58100774/Sp_swd.csv environmentallayers=bank.vole/models/bank_voleFirstModeling/m_58100774/Back_swd.csv nowarnings notooltips noaskoverwrite threshold noaddsamplestobackground autorun novisible
+Species: bank.vole_AllData_RUN2
+Layers: Built2009 Popdensity2010 Railways Roads wc2.1_2.5m_bio_1 wc2.1_2.5m_bio_12 wc2.1_2.5m_bio_15 wc2.1_2.5m_bio_4
+Layertypes: Continuous Continuous Continuous Continuous Continuous Continuous Continuous Continuous
+outputformat: logistic
+outputdirectory: bank.vole/models/bank_voleFirstModeling/bank.vole_AllData_RUN2_MAXENT.Phillips_outputs
+projectionlayers: bank.vole/models/bank_voleFirstModeling/m_58100774/Predictions/Pred_swd.csv
+samplesfile: bank.vole/models/bank_voleFirstModeling/m_58100774/Sp_swd.csv
+environmentallayers: bank.vole/models/bank_voleFirstModeling/m_58100774/Back_swd.csv
+warnings: false
+tooltips: false
+askoverwrite: false
+threshold: true
+addsamplestobackground: false
+autorun: true
+visible: false
+
+getSamples: max memory 477626368, total allocated 247463936, free 211055976, used 36407960, increment 1301136
+bank.vole_AllData_RUN2: 
+Regularization values: linear/quadratic/product: 0.050, categorical: 0.250, threshold: 1.000, hinge: 0.500
+387 samples
+Density: max memory 477626368, total allocated 247463936, free 208443832, used 39020104, increment 2612144
+linearPredictor: max memory 477626368, total allocated 247463936, free 208443832, used 39020104, increment 0
+FeaturedSpace: max memory 477626368, total allocated 247463936, free 208443832, used 39020104, increment 0
+Sequential: max memory 477626368, total allocated 247463936, free 208443832, used 39020104, increment 0
+Initial loss: 5.971261839790462
+Time since start: 1.067
+500: time = 0.968000 loss = 2.301570
+Resulting gain: 3.6696918762724127
+Projecting...
+Writing file bank.vole\models\bank_voleFirstModeling\bank.vole_AllData_RUN2_MAXENT.Phillips_outputs\bank.vole_AllData_RUN2.csv
+Projecting...
+Reading file Pred_swd.csv
+readGrid: max memory 477626368, total allocated 333447168, free 188463352, used 144983816, increment 105963712
+Writing file bank.vole\models\bank_voleFirstModeling\bank.vole_AllData_RUN2_MAXENT.Phillips_outputs\bank.vole_AllData_RUN2_Pred_swd.csv
+Writing file bank.vole\models\bank_voleFirstModeling\bank.vole_AllData_RUN2_MAXENT.Phillips_outputs\bank.vole_AllData_RUN2_Pred_swd_clamping.csv
+Ending

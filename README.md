@@ -13,6 +13,20 @@ The performance of ensembles is often assumed to be better than individual model
 
 > Hao, T., Elith, J., Guillera-Arroita, G. & Lahoz-Monfort, J.J. (2019) ‘A review of evidence about use and performance of species distribution modelling ensembles like BIOMOD’, Diversity and Distributions, 25(5), pp. 839–852.
 
+# Using Circuitscape
+
+To run Circuitscape, the latest version of Julia should be installed. At the Julia prompt run the following commands to install Circuitscape:
+
+    using Pkg
+    Pkg.add("Circuitscape")
+
+To run the job and reproduce the resistance maps, navigate to the circuitscape folder and run the preprepared INI file.
+
+    cd("/species-distribution-modelling/circuitscape")
+
+    using Circuitscape
+    compute("circuitscape.ini")
+
 # License
 
 This project is licensed under the MIT license - see LICENSE.txt file for more details.

@@ -1,0 +1,8 @@
+┌ Info: 2022-05-11 12:45:47 : Logs will recorded to file: log_file
+└ @ Circuitscape C:\Users\Danny\.julia\packages\Circuitscape\yLUwS\src\logging.jl:16
+┌ Info: 2022-05-11 12:45:47 : Precision used: Double
+└ @ Circuitscape C:\Users\Danny\.julia\packages\Circuitscape\yLUwS\src\logging.jl:16
+┌ Info: 2022-05-11 12:45:52 : Reading maps
+└ @ Circuitscape C:\Users\Danny\.julia\packages\Circuitscape\yLUwS\src\logging.jl:16
+┌ Info: 2022-05-11 12:45:54 : Resistance/Conductance map has 1680826 nodes
+└ @ Circuitscape C:\Users\Danny\.julia\packages\Circuitscape\yLUwS\src\logging.jl:16
