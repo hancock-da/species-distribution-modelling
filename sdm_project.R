@@ -112,7 +112,7 @@ cor_mat < -0.7
 # cor_plot <- raster.cor.plot(cropped_predictors, method='pearson')
 # cor_plot
 
-# keep most biologically easy to explain layers. Also dropping elev and HFP which are used to impute other maps
+# keep most biologically easy to explain layers. Also dropping elev and HFP which the other maps are interpolated from.
 test_predictors_cropped <- dropLayer(cropped_predictors, c('wc2.1_2.5m_bio_10','wc2.1_2.5m_bio_11','wc2.1_2.5m_bio_2','wc2.1_2.5m_bio_3','wc2.1_2.5m_bio_5',
                                                            'wc2.1_2.5m_bio_6','wc2.1_2.5m_bio_7','wc2.1_2.5m_bio_9',
                                                            'wc2.1_2.5m_bio_13','wc2.1_2.5m_bio_14','wc2.1_2.5m_bio_16',
