@@ -7,7 +7,7 @@ library(biomod2)
 library(remotes)
 library(ENMTools)
 
-setwd('C:/Users/Danny/Documents/projects/species-distribution-modelling')
+setwd("./species-distribution-modelling")
 
 SPECIES <- 'bank_vole'
 
@@ -74,12 +74,39 @@ points(actest, cex=1, col='blue',pch='x')
 ### ENVIRONMENTAL DATA ###
 bioclim_path <- "map_files/bioclim"
 bioclim_files <- list.files(bioclim_path, pattern='tif$',full.names=TRUE)
-
-hf_path <- "map_files/human_footprint/aggregated"
-hf_files <- list.files(hf_path, pattern='tif$',full.names=TRUE)
-
 # create a rasterStack of predictor variables
 bioclim_predictors <-  stack(bioclim_files)
+
+# function to project and aggregate rasters to same as bioclim rasters
+resizeRasterStack <- function(source_stack, target_stack, output_path, agg_factor=4) {
+  print(names(source_stack))
+  # if raster stacks share the same CRS, only need to aggregate.
+  if (identical(crs(source_stack), crs(target_stack))) {
+    resolution <- res(target_stack)
+    fact <- resolution/res(source_stack)
+    agg_raster <- aggregate(source_stack, fact, fun='mean')
+  } else {
+    gc()
+    agg_raster <- aggregate(source_stack, fact=agg_factor) # this line is to make the projection manageable with small amounts of RAM but may need changing
+    agg_raster <- projectRaster(agg_raster, res=res(target_stack[[1]]), crs=crs(target_stack[[1]])) # project to match resolution and CRS.
+  }
+  for (r in 1:nlayers(agg_raster)) {
+    writeRaster(agg_raster[[r]], paste(output_path,names(source_stack)[[r]],'.tif',sep=""))
+  }
+  return(NULL)
+}
+
+# Process Human Footprint Maps to same CRS and resolution
+# Uncomment if processing again.
+# raw_hf_path <- "map_files/human_footprint/raw"
+# raw_hf_files <- list.files(raw_hf_path, pattern='tif$', full.names=TRUE)
+# raw_hf_predictors <- stack(raw_hf_files)
+# 
+# resizeRasterStack(raw_hf_predictors, bioclim_predictors, "map_files/human_footprint/aggregated")
+
+# Read in human aggregated human footprint maps
+hf_path <- "map_files/human_footprint/aggregated"
+hf_files <- list.files(hf_path, pattern='tif$',full.names=TRUE)
 hf_predictors <- stack(hf_files)
 
 # function to crop layers of a stack to a specified extent and keep the output as a RasterStack
@@ -112,7 +139,7 @@ cor_mat < -0.7
 # cor_plot <- raster.cor.plot(cropped_predictors, method='pearson')
 # cor_plot
 
-# keep most biologically easy to explain layers. Also dropping elev and HFP which are used to impute other maps
+# keep most biologically easy to explain layers. Also dropping elev and HFP which the other maps are interpolated from.
 test_predictors_cropped <- dropLayer(cropped_predictors, c('wc2.1_2.5m_bio_10','wc2.1_2.5m_bio_11','wc2.1_2.5m_bio_2','wc2.1_2.5m_bio_3','wc2.1_2.5m_bio_5',
                                                            'wc2.1_2.5m_bio_6','wc2.1_2.5m_bio_7','wc2.1_2.5m_bio_9',
                                                            'wc2.1_2.5m_bio_13','wc2.1_2.5m_bio_14','wc2.1_2.5m_bio_16',

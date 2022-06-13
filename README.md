@@ -1,21 +1,13 @@
 # species-distribution-modelling
-*This script is an excerpt from my Master's research project aimed at determining the drivers behind genetic differentiation in mammals and includes data for just a single species - the Bank Vole.*
+*This is a small part of a wider research project investigating the drivers behind genetic differentiation in mammals and includes data for just a single species - the Bank Vole.*
 
-For this project I built species distribution models which predict the possible distribution of a species by modelling the presence/absence of occurrence based on bioclimatic spatial data (average rainfall/temperature etc) and urbanisation data. To achieve this a number of different individual algorithms were employed including Random Forests, Artificial Neural Networks, Generalized Linear Models, Boosted Regression Trees and MAXENT using the biomod2 package in R.
+This species distribution model predicts the possible distribution of bank voles in Europe by predicting the presence/absence of occurrence based on coordinates of known sightings with predictor variables including bioclimatic features (average rainfall/temperature etc) and human impact spatial data (population density, roads etc). To achieve this a number of different individual algorithms were tested including Random Forests, Artificial Neural Networks, Generalized Linear Models, Boosted Regression Trees and MAXENT using the biomod2 package in R (Thuiler et al. 2009). The best performing models according to the Receiver Operating Characteristic (ROC) score were merged to build an ensemble for presence prediction.
 
-I then evaluated these models against a separate test dataset using Receiver Operating Characteristic (ROC) scores and chose the best performing algorithm on average to build an ensemble of three separate runs with differing internal cross-validation.
+The resulting species distribution model is then fed into Circuitscape (Anantharaman et al., 2019), an open-source Julia program that uses electric circuit theory to model connectivity in heterogeneous landscapes. The output of pairwise comparisons between populations is a 'resistance distance' or the strength of resistance to dispersal between populations. 
 
-The performance of ensembles is often assumed to be better than individual models and comparisons are rarely made or reported (Hao et al. 2019). I therefore compared performances in predicting occurrences in the test dataset finding that in the case of the Bank Vole, the ensemble performed worse than individual Boosted Regression Tree models. The ensembles will further be evaluated against individual models in their ability to best explain the genetic structure of the species in future work.
+The resistance distances are then evaluated in isolation_distance.R in their ability to explain genetic distance (Fst) between populations, also taking into account geographic distances between coordinates and environmental distance, calculated by performing principle component analysis on extracted values of the 19 bioclimatic variables at population coordinates. The strength of effect and significance of each distance metrics ability to explain genetic differentiation is assessed by multiple regression on distance matrices (Lichstein 2007).
 
-> Biomclimatic data from: *https://www.worldclim.org/data/bioclim.html.*
-
-> Urbanisation data from *https://land.copernicus.eu/global/*
-
-> Species occurrence records from: *GBIF.org (10 December 2021) GBIF Occurrence Download https://doi.org/10.15468/dl.u9qgut*
-
-> Hao, T., Elith, J., Guillera-Arroita, G. & Lahoz-Monfort, J.J. (2019) ‘A review of evidence about use and performance of species distribution modelling ensembles like BIOMOD’, Diversity and Distributions, 25(5), pp. 839–852.
-
-# Using Circuitscape
+# Using Circuitscape to recreate resistance maps
 
 To run Circuitscape, the latest version of Julia should be installed. At the Julia prompt run the following commands to install Circuitscape:
 
@@ -28,6 +20,24 @@ To run the job and reproduce the resistance maps, navigate to the circuitscape f
 
     using Circuitscape
     compute("circuitscape.ini")
+
+# References used above
+
+> Bank Vole genetic data from Marková, S., Horníková, M., Lanier, H.C., Henttonen, H., Searle, J.B., Weider, L.J. & Kotlík, P. (2020) ‘High genomic diversity in the bank vole at the northern apex of a range expansion: The role of multiple colonizations and end-glacial refugia’, Molecular Ecology, 29(9), pp. 1730–1744.
+
+> Biomclimatic data from: *https://www.worldclim.org/data/bioclim.html.*
+
+> Human impact data from Venter, O., Sanderson, E.W., Magrach, A., Allan, J.R., Beher, J., Jones, K.R., Possingham, H.P., Laurance, W.F., Wood, P., Fekete, B.M., Levy, M.A. & Watson, J.E.M. (2016) ‘Global terrestrial Human Footprint maps for 1993 and 2009’, Scientific Data, 3(1), p. 160067.
+
+> Species occurrence records from: *GBIF.org (10 December 2021) GBIF Occurrence Download https://doi.org/10.15468/dl.u9qgut*
+
+> Anantharaman, R., Hall, K., Shah, V. & Edelman, A. (2019) ‘Circuitscape in Julia: High Performance Connectivity Modelling to Support Conservation Decisions’, arXiv:1906.03542 [q-bio]
+
+> Lichstein, J.W. (2007) ‘Multiple regression on distance matrices: a multivariate spatial analysis tool’, Plant Ecology, 188(2), pp. 117–131.
+
+> Thuiller, W., Lafourcade, B., Engler, R. & Araújo, M.B. (2009) ‘BIOMOD – a platform for ensemble forecasting of species distributions’, Ecography, 32(3), pp. 369–373.
+
+
 
 # License
 
