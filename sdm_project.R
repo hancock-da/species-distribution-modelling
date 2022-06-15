@@ -104,7 +104,7 @@ resizeRasterStack <- function(source_stack, target_stack, output_path, agg_facto
 # 
 # resizeRasterStack(raw_hf_predictors, bioclim_predictors, "map_files/human_footprint/aggregated")
 
-# Read in human aggregated human footprint maps
+# Read in aggregated human footprint maps
 hf_path <- "map_files/human_footprint/aggregated"
 hf_files <- list.files(hf_path, pattern='tif$',full.names=TRUE)
 hf_predictors <- stack(hf_files)
@@ -139,12 +139,12 @@ cor_mat < -0.7
 # cor_plot <- raster.cor.plot(cropped_predictors, method='pearson')
 # cor_plot
 
-# keep most biologically easy to explain layers. Also dropping elev and HFP which the other maps are interpolated from.
+# keep most biologically easy to explain layers. Also dropping elev which the other bioclim maps are interpolated from.
 test_predictors_cropped <- dropLayer(cropped_predictors, c('wc2.1_2.5m_bio_10','wc2.1_2.5m_bio_11','wc2.1_2.5m_bio_2','wc2.1_2.5m_bio_3','wc2.1_2.5m_bio_5',
                                                            'wc2.1_2.5m_bio_6','wc2.1_2.5m_bio_7','wc2.1_2.5m_bio_9',
                                                            'wc2.1_2.5m_bio_13','wc2.1_2.5m_bio_14','wc2.1_2.5m_bio_16',
                                                            'wc2.1_2.5m_bio_17','wc2.1_2.5m_bio_18','wc2.1_2.5m_bio_19',
-                                                           'Lights2009','wc2.1_2.5m_elev','HFP2009'))
+                                                           'Lights2009','wc2.1_2.5m_elev'))
 
 # drop further features that add little importance to best performing models (GBM and RF) to minimise overfitting
 test_predictors_cropped <- dropLayer(test_predictors_cropped, c('Navwater2009','Pasture2009','croplands2005','wc2.1_2.5m_bio_8'))
@@ -246,7 +246,7 @@ myBiomodModelOut
 myBiomodModelEval <- get_evaluations(myBiomodModelOut)
 myBiomodModelEval
 
-# graph evalation scores by model
+# graph evaluation scores by model
 models_scores_graph(
   myBiomodModelOut,
   by = "models",
@@ -327,7 +327,7 @@ plot(myBiomodEF)
 # conversion to geotiff for circuitscape
 mygrd <- raster("bank.vole/proj_current/proj_current_bank.vole_ensemble.grd")
 mygrd
-# replace nas (the sea) and 0s with the minimum value to allow some small chance of dispersal across islands.
+# replace nas (the sea) and 0s with the minimum value to allow some small chance of dispersal across oceans and seas.
 mygrd[is.na(mygrd)] <- min(mygrd[mygrd>0])
 mygrd[mygrd==0] <- min(mygrd[mygrd>0])
 
